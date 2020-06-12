@@ -13,6 +13,8 @@ const editImage = {
         color: '#ea4c72',
         fontSize: 14
       },
+      scaleIndex: 5,
+      activeId: 0
     },
     currentEdit: {
       strokeWidth: 2,
@@ -23,9 +25,11 @@ const editImage = {
         color: '#ea4c72',
         fontSize: 14
       },
+      scaleIndex: 5,
+      activeId: 0
     },
     currentSvg: [],
-    currentImage: {}
+    currentImage: {},
   },
   mutations: {
     SET_STROKE_WIDTH: (state, width) => {
@@ -56,39 +60,49 @@ const editImage = {
       state.currentSvg.push(data)
     },
     SET_IMAGE_LIST: (state, data) => {
-      if (state.currentImage.uid) {
-        const index = state.imageList.findIndex(e => e.image.uid === state.currentImage.uid);
-        if (index < 0) {
-          state.imageList.push({
-            edit: state.currentEdit,
-            svg: state.currentSvg,
-            image: state.currentImage
-          })
-        } else {
-          Object.assign(state.imageList[index], {
-            edit: state.currentEdit,
-            svg: state.currentSvg,
-            image: state.currentImage
-          })
-        }
-        const currentIndex = state.imageList.findIndex(e => e.image.uid === data.uid);
-        if (currentIndex < 0) {
-          state.currentEdit = _.cloneDeep(state.initEdit);
-          state.currentSvg = [];
-          state.currentImage = _.cloneDeep(data)
-        } else {
-          state.currentEdit = _.cloneDeep(state.imageList[currentIndex].edit);
-          state.currentSvg = _.cloneDeep(state.imageList[currentIndex].svg);
-          state.currentImage = _.cloneDeep(state.imageList[currentIndex].image)
-        }
+      const index = state.imageList.findIndex(e => e.image.uid === state.currentImage.uid);
+      if (index < 0) {
+        state.imageList.push({
+          edit: state.currentEdit,
+          svg: state.currentSvg,
+          image: state.currentImage
+        })
       } else {
-        state.currentImage = data
+        Object.assign(state.imageList[index], {
+          edit: state.currentEdit,
+          svg: state.currentSvg,
+          image: state.currentImage
+        })
       }
+      const currentIndex = state.imageList.findIndex(e => e.image.uid === data.uid);
+      state.currentEdit = _.cloneDeep(state.imageList[currentIndex].edit);
+      state.currentSvg = _.cloneDeep(state.imageList[currentIndex].svg);
+      state.currentImage = _.cloneDeep(state.imageList[currentIndex].image);
+      state.currentEdit.scaleIndex = 5;
+      state.currentEdit.activeId = 0;
+    },
+    SET_IMAGE: (state, data) => {
+      if (!state.currentImage.uid) state.currentImage = data;
+      state.imageList.push({
+        edit: _.cloneDeep(state.initEdit),
+        svg: [],
+        image: _.cloneDeep(data)
+      });
     },
     DELETE_CURRENT_SVG: (state, data) => {
       const i = state.currentSvg.findIndex(e => e.id === data.id);
       state.currentSvg.splice(i, 1)
     },
+    UPDATE_SCALE_ID: (state, data) => {
+      if (data) {
+        ++state.currentEdit.scaleIndex;
+      } else {
+        --state.currentEdit.scaleIndex;
+      }
+    },
+    UPDATE_ACTIVE_ID: (state, data) => {
+      state.currentEdit.activeId = data
+    }
   },
   actions: {
     // 更新边框宽度
@@ -114,6 +128,15 @@ const editImage = {
     // 更新图片列表
     updateImageList ({ commit }, data) {
       commit('SET_IMAGE_LIST', data)
+    },
+    addImageList ({ commit }, data) {
+      commit('SET_IMAGE', data)
+    },
+    updateScaleId ({ commit }, data) {
+      commit('UPDATE_SCALE_ID', data)
+    },
+    updateActiveId ({ commit }, data) {
+      commit('UPDATE_ACTIVE_ID', data)
     }
   }
 };

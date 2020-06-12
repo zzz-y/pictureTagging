@@ -4,7 +4,8 @@
       class="upload-wrapper"
       action="https://jsonplaceholder.typicode.com/posts/"
       list-type="picture-card"
-      :auto-upload="false">
+      :auto-upload="false"
+      :on-change="handelChange">
       <i slot="default" class="el-icon-plus"></i>
       <div slot="file" slot-scope="{file}" @click="changeImage(file)">
         <img
@@ -21,7 +22,6 @@
     </el-upload>
     <image-tag :colorList="colorList"
                :fontSizeList="fontSizeList"
-               :active="active"
     ></image-tag>
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="">
@@ -44,7 +44,6 @@ export default {
       dialogImageUrl: '',
       dialogVisible: false,
       disabled: false,
-      active: 0,
       colorList: [
         '#ea4c72', '#f5b225', '#48c486', '#4386f5', '#000000', '#ffffff'
       ],
@@ -54,17 +53,25 @@ export default {
   methods: {
     ...mapActions('editImage', [
       'updateImageList',
+      'addImageList',
+      'initCurrentSvg',
     ]),
     changeImage (file) {
       changeImageBg(file);
       this.updateImageList(file);
       scaleGraphics();
-      this.active = 0;
+    },
+    handelChange (file, fileList) {
+      this.addImageList(file);
+      if (fileList.length === 1) {
+        changeImageBg(file);
+        scaleGraphics();
+      }
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-  }
+  },
 }
 </script>

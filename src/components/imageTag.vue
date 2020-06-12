@@ -76,11 +76,9 @@ export default {
   props: {
     colorList: Array,
     fontSizeList: Array,
-    active: Number,
   },
   data() {
     return {
-      activeId: null,
       operationList: [
         {
           id: 1,
@@ -165,18 +163,9 @@ export default {
           width: width * 4,
           height: height * 4 - 36,
           scale: 4
-      }],
-      scaleIndex: 5,
+      }
+      ],
     };
-  },
-  mounted () {
-    drawInit();
-    console.log(this.currentEdit);
-  },
-  watch: {
-    active() {
-      this.activeId = this.active
-    }
   },
   methods: {
     ...mapActions('editImage', [
@@ -184,9 +173,11 @@ export default {
       'updateColor',
       'updateFontSize',
       'updateImageList',
+      'updateScaleId',
+      'updateActiveId',
     ]),
     shapeToggle (shapeId) {
-      this.activeId = shapeId;
+      this.updateActiveId(shapeId);
       toggleDrawingMode(shapeId);
       switch (shapeId) {
         case 1:
@@ -217,23 +208,21 @@ export default {
       this.updateFontSize(this.fontSize)
     },
     scale(isAdd) {
-      if (isAdd) {
-        ++this.scaleIndex
-      } else {
-        --this.scaleIndex
-      }
+      this.updateScaleId(isAdd);
       changeScale(this.scaleList[this.scaleIndex].scale);
-      scaleGraphics()
+      scaleGraphics(this.scaleList[this.scaleIndex].scale)
     },
     deleteTag () {
       deleteTags()
     }
   },
   computed: {
-    ...mapState('editImage', [
-      'currentEdit',
-      'currentSvg',
-    ])
+    ...mapState('editImage', {
+      currentEdit: state => state.currentEdit,
+      currentSvg: state => state.currentEdit,
+      scaleIndex: state => state.currentEdit.scaleIndex,
+      activeId: state => state.currentEdit.activeId,
+    }),
   }
 }
 </script>

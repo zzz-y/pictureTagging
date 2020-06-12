@@ -22,13 +22,13 @@ let selectedTag = {
 };
 
 /* 绘制初始化 */
-export function drawInit () {
+function drawInit (scaleNum) {
   if (svg) {
     svg.remove()
   }
   drawingModeId = 0;
   drawingMode = '';
-  scale = 1;
+  scale = scaleNum;
   coords = {
     sP: null,
     eP: null,
@@ -50,7 +50,7 @@ export function drawInit () {
   svg.append('image').attr('id', 'imageBg')
 }
 
-export function changeImageBg (file) {
+function changeImageBg (file) {
   d3.select('#imageBg')
     .attr('xlink:href', file.url)
     .attr('width', '100%')
@@ -60,7 +60,7 @@ export function changeImageBg (file) {
 }
 
 /* 切换绘制模式 */
-export function toggleDrawingMode (shapeId) {
+function toggleDrawingMode (shapeId) {
   drawingModeId = shapeId;
   switch (shapeId) {
     case 1:
@@ -79,15 +79,15 @@ export function toggleDrawingMode (shapeId) {
 }
 
 // 缩放系数变化时，重绘所有图形
-export function scaleGraphics () {
+function scaleGraphics (scale = 1) {
   const created = cloneDeep(store.state.editImage.currentSvg);
-  drawInit();
+  drawInit(scale);
   changeImageBg(store.state.editImage.currentImage);
   drawCreated(created)
 }
 
 /* 绘制已创建的批注项图形 */
-export function drawCreated (data) {
+function drawCreated (data) {
   data.forEach((d) => {
     currentShape = svg.append(d.drawingMode);
     coords = d.coords ? scaleParamRecover(d.coords) : {
@@ -105,12 +105,12 @@ export function drawCreated (data) {
 }
 
 /* 改变缩放比例 */
-export function changeScale (s) {
+function changeScale (s) {
   scale = s
 }
 
 /* 删除标记 */
-export function deleteTags () {
+function deleteTags () {
   d3.select(`#time_${selectedTag.id}`).remove();
   store.dispatch('editImage/deleteTag', selectedTag);
   selectedTag = {
@@ -465,4 +465,14 @@ function wrapWord (width, text) {
       tspan = currentShape.append('tspan').attr('x', x).attr('y', ++lineNumber * lineHeight + y).text(word)
     }
   }
+}
+
+export {
+  drawInit,
+  changeImageBg,
+  toggleDrawingMode,
+  scaleGraphics,
+  drawCreated,
+  changeScale,
+  deleteTags,
 }
