@@ -49,7 +49,8 @@
       </span>
     </div>
     <div class="main">
-      <div id="svg-container" :style="{width: `${scaleList[scaleIndex].width}px`,
+      <div id="svg-container" :style="{
+        width: `${scaleList[scaleIndex].width}`,
         height: `${scaleList[scaleIndex].height}px`,
         left: `${scaleList[scaleIndex].scale < 1 ? '50%' : 'inherit'}`,
         transform: `${scaleList[scaleIndex].scale < 1 ? 'translateX(-50%)':'inherit'}`}"></div>
@@ -69,7 +70,9 @@ import { drawInit, toggleDrawingMode, changeScale,
   scaleGraphics, deleteTags, changeImageBg } from '@/js/draw'
 import { mapState, mapActions } from 'vuex'
 
-const width = $('.main').width();
+const w = document.body.clientWidth
+const rem = parseInt(window.getComputedStyle(document.documentElement)['fontSize'])
+const width = (w - rem * 4) / 2 - 3;
 const height = 500;
 export default {
   name: 'HelloWorld',
@@ -105,65 +108,60 @@ export default {
       checkedColor: '',
       scaleList: [
         {
-          width: width * 0.2,
+          width: `${width * 0.2}px`,
           height: height * 0.2 - 36,
           scale: 0.2
         },
         {
-          width: width * 0.3,
+          width: `${width * 0.3}px`,
           height: height * 0.3 - 36,
           scale: 0.3
         },
         {
-          width: width * 0.5,
+          width: `${width * 0.5}px`,
           height: height * 0.5 - 36,
           scale: 0.5
         },
         {
-          width: width * 0.8,
+          width: `${width * 0.8}px`,
           height: height * 0.8 - 36,
           scale: 0.8
         },
         {
-          width: width * 0.9,
+          width: `${width * 0.9}px`,
           height: height * 0.9 - 36,
           scale: 0.9
         },
         {
-          width: width,
-          height: height - 40,
+          width: '100%',
+          height: height - 45,
           scale: 1
         },
         {
-
-          width: width * 1.5,
+          width: `${width * 1.5}px`,
           height: height * 1.5 - 36,
           scale: 1.5
         },
         {
-
-          width: width * 2,
+          width: `${width * 2}px`,
           height: height * 2 - 36,
           scale: 2
         },
         {
-
-          width: width * 2.5,
+          width: `${width * 2.5}px`,
           height: height * 2.5 - 36,
           scale: 2.5
         },
         {
-
-          width: width * 3,
+          width: `${width * 3}px`,
           height: height * 3 - 36,
           scale: 3
         },
         {
-
-          width: width * 4,
+          width: `${width * 4}px`,
           height: height * 4 - 36,
           scale: 4
-      }
+        }
       ],
     };
   },
