@@ -1,43 +1,43 @@
 import * as d3 from 'd3'
 import $ from 'jquery'
-import { min, max, forOwn, cloneDeep } from 'lodash'
+import { min, cloneDeep } from 'lodash'
 import { drawStraight, translatePath } from './drawStraight'
 import store from '@/store'
 
-let svg = null
-let drawingMode = '' // 绘制图形类别：矩形、椭圆、直线
-let drawingModeId = 0
-let textPosition = {}
-let scale = 1 // 缩放比例
-let currentShape = null // 当前绘制图形
-let current = store.state.editImage.currentEdit
+let svg = null;
+let drawingMode = ''; // 绘制图形类别：矩形、椭圆、直线
+let drawingModeId = 0;
+let textPosition = {};
+let scale = 1; // 缩放比例
+let currentShape = null; // 当前绘制图形
+let current = store.state.editImage.currentEdit;
 let coords = {
   sP: null, // 起点偏移,{ offsetX: num, offsetY: num }
   eP: null, // 终点偏移
-}
+};
 let selectedTag = {
   color: '',
   id: '',
   drawingMode: ''
-}
+};
 
 /* 绘制初始化 */
 export function drawInit () {
   if (svg) {
     svg.remove()
   }
-  drawingModeId = 0
-  drawingMode = ''
-  scale = 1
+  drawingModeId = 0;
+  drawingMode = '';
+  scale = 1;
   coords = {
     sP: null,
     eP: null,
-  }
+  };
   textPosition = {
     x: 0,
     y: 0
-  }
-  current = store.state.editImage.currentEdit
+  };
+  current = store.state.editImage.currentEdit;
   svg = d3.select('#svg-container')
     .append('svg')
     .attr('width', '100%')
@@ -45,7 +45,7 @@ export function drawInit () {
     .on('mousedown', handleMouseDown)
     .on('mousemove', handleMouseMove)
     .on('mouseup', handleMouseUp)
-    .on('click', handleClick)
+    .on('click', handleClick);
 
   svg.append('image').attr('id', 'imageBg')
 }
@@ -61,39 +61,39 @@ export function changeImageBg (file) {
 
 /* 切换绘制模式 */
 export function toggleDrawingMode (shapeId) {
-  drawingModeId = shapeId
+  drawingModeId = shapeId;
   switch (shapeId) {
     case 1:
-      drawingMode = 'path'
-      break
+      drawingMode = 'path';
+      break;
     case 2:
-      drawingMode = 'rect'
-      break
+      drawingMode = 'rect';
+      break;
     case 3:
-      drawingMode = 'ellipse'
-      break
+      drawingMode = 'ellipse';
+      break;
     case 4:
-      drawingMode = 'text'
+      drawingMode = 'text';
       break
   }
 }
 
 // 缩放系数变化时，重绘所有图形
 export function scaleGraphics () {
-  const created = cloneDeep(store.state.editImage.currentSvg)
-  drawInit()
-  changeImageBg(store.state.editImage.currentImage)
+  const created = cloneDeep(store.state.editImage.currentSvg);
+  drawInit();
+  changeImageBg(store.state.editImage.currentImage);
   drawCreated(created)
 }
 
 /* 绘制已创建的批注项图形 */
 export function drawCreated (data) {
   data.forEach((d) => {
-    currentShape = svg.append(d.drawingMode)
+    currentShape = svg.append(d.drawingMode);
     coords = d.coords ? scaleParamRecover(d.coords) : {
       sP: null,
       eP: null
-    }
+    };
     if (d.textPosition) {
       d.textPosition = {
         x: d.textPosition.x * scale,
@@ -111,8 +111,8 @@ export function changeScale (s) {
 
 /* 删除标记 */
 export function deleteTags () {
-  d3.select(`#time_${selectedTag.id}`).remove()
-  store.dispatch('editImage/deleteTag', selectedTag)
+  d3.select(`#time_${selectedTag.id}`).remove();
+  store.dispatch('editImage/deleteTag', selectedTag);
   selectedTag = {
     color: '',
     id: '',
@@ -125,7 +125,7 @@ function handleMouseDown () {
     coords.sP = {
       offsetX: d3.event.offsetX,
       offsetY: d3.event.offsetY
-    }
+    };
     if (drawingModeId < 4) {
       currentShape = svg.append(drawingMode)
     } else {
@@ -133,15 +133,15 @@ function handleMouseDown () {
         textPosition = {
           x: d3.event.offsetX,
           y: d3.event.offsetY + current.text.fontSize
-        }
-        $('#textInput').text('')
-        $('#textInput').css('display', 'block').css('top', (d3.event.offsetY + 24)).css('left', d3.event.offsetX)
+        };
+        $('#textInput').text('');
+        $('#textInput').css('display', 'block').css('top', (d3.event.offsetY + 24)).css('left', d3.event.offsetX);
         $('#textInput')[0].click()
       } else {
-        $('#textInput').css('display', 'none')
-        currentShape = svg.append(drawingMode)
-        const timestampId = Date.now()
-        currentShape = drawGraphic(drawingMode, timestampId).attr('id', `time_${timestampId}`)
+        $('#textInput').css('display', 'none');
+        currentShape = svg.append(drawingMode);
+        const timestampId = Date.now();
+        currentShape = drawGraphic(drawingMode, timestampId).attr('id', `time_${timestampId}`);
         textPosition = {
           x: 0,
           y: 0
@@ -152,42 +152,42 @@ function handleMouseDown () {
 }
 
 function handleMouseMove () {
-  svg.style('cursor', drawingModeId < 4 ? 'crosshair' : '')
+  svg.style('cursor', drawingModeId < 4 ? 'crosshair' : '');
   if (drawingMode && coords.sP && drawingModeId < 4) {
     coords.eP = {
       offsetX: d3.event.offsetX,
       offsetY: d3.event.offsetY
-    }
+    };
     drawGraphic(drawingMode)
   }
   return
 }
 
 function handleMouseUp () {
-  console.log('mouse up')
+  console.log('mouse up');
   if (drawingMode && coords.sP && drawingModeId < 4) {
     coords.eP = {
       offsetX: d3.event.offsetX,
       offsetY: d3.event.offsetY
-    }
+    };
     if (!isParamsValid(coords, drawingMode)) {
       currentShape.remove()
     } else {
-      const timestampId = Date.now()
+      const timestampId = Date.now();
       currentShape = drawGraphic(drawingMode, timestampId).attr('id', `time_${timestampId}`)
     }
   }
   coords = {
     sP: null,
     eP: null
-  }
+  };
   svg.style('cursor', '')
 }
 
 function handleClick () {
-  console.log('click')
+  console.log('click');
   if (selectedTag.id) {
-    recoveryTag(selectedTag, selectedTag.color)
+    recoveryTag(selectedTag, selectedTag.color);
     selectedTag = {
       color: '',
       id: '',
@@ -236,7 +236,7 @@ function isParamsValid (coords, drawingMode) {
       return (Math.abs(coords.sP.offsetX - coords.eP.offsetX)
         + Math.abs(coords.sP.offsetY - coords.eP.offsetY)) > 5
     }
-  }
+  };
   return funcMap[drawingMode]()
 }
 
@@ -292,7 +292,7 @@ function graphicParamFormat (coords, drawingMode, created) {
         y: coords.sP.offsetY,
       }
     },
-  }
+  };
   return funcMap[drawingMode](coords)
 }
 
@@ -302,8 +302,8 @@ function drawGraphic (drawingMode, id, created) {
     ellipse: drawEllipse,
     path: drawLine,
     text: drawText,
-  }
-  const params = graphicParamFormat(coords, drawingMode, created)
+  };
+  const params = graphicParamFormat(coords, drawingMode, created);
   if (id) {
     if (textPosition.y !== 0) {
       textPosition = {
@@ -330,20 +330,20 @@ function mouseOut (d) {
 }
 
 function recoveryTag (d, color) {
-  const selectedNode = d3.select(`#time_${d.id}`)
+  const selectedNode = d3.select(`#time_${d.id}`);
   switch (d.drawingMode) {
     case 'path':
       selectedNode.attr('stroke', color)
-        .attr('fill', d.color)
-      break
+        .attr('fill', d.color);
+      break;
     case 'rect':
-      selectedNode.attr('stroke', color)
-      break
+      selectedNode.attr('stroke', color);
+      break;
     case 'ellipse':
-      selectedNode.attr('stroke', color)
-      break
+      selectedNode.attr('stroke', color);
+      break;
     case 'text':
-      selectedNode.attr('fill', color)
+      selectedNode.attr('fill', color);
       break
   }
 }
@@ -352,20 +352,20 @@ function clickTag (d) {
   if (selectedTag.id) {
     recoveryTag(selectedTag, selectedTag.color)
   }
-  const newColor = ColorReverse(d.color)
-  recoveryTag(d, newColor)
+  const newColor = ColorReverse(d.color);
+  recoveryTag(d, newColor);
   selectedTag = {
     color: d.color,
     id: d.id,
     drawingMode: d.drawingMode,
-  }
+  };
   event.stopPropagation()
 }
 
 function ColorReverse (Old) {
-  const OldColorValue = `0x${Old.replace(/#/g, '')}`
-  const str = `000000${(0xFFFFFF - OldColorValue).toString(16)}`
-  return `#${str.substring(str.length - 6, str.length)}`
+  const OldColorValue = `0x${Old.replace(/#/g, '')}`;
+  const str = `000000${(0xFFFFFF - OldColorValue).toString(16)}`;
+  return `#${str.substring(str.length - 6, str.length)}`;
 }
 
 function drawRect (params) {
@@ -441,27 +441,27 @@ function drawText (params) {
     })
     .on('click', () => {
       clickTag(params)
-    })
-  wrapWord($('#svg-container').width() - params.x, params.text)
+    });
+  wrapWord($('#svg-container').width() - params.x, params.text);
   return currentShape
 }
 
 function wrapWord (width, text) {
-  const words = text.split('').reverse()
-  let word
-  let line = []
-  let lineNumber = 0
-  const lineHeight = currentShape.node().getBoundingClientRect().height
-  const x = +currentShape.attr('x')
-  const y = +currentShape.attr('y')
-  let tspan = currentShape.text(null).append('tspan').attr('x', x).attr('y', y)
-  while (word = words.pop()) {
-    line.push(word)
-    tspan.text(line.join(''))
+  const words = text.split('').reverse();
+  let word;
+  let line = [];
+  let lineNumber = 0;
+  const lineHeight = currentShape.node().getBoundingClientRect().height;
+  const x = +currentShape.attr('x');
+  const y = +currentShape.attr('y');
+  let tspan = currentShape.text(null).append('tspan').attr('x', x).attr('y', y);
+  while (word === words.pop()) {
+    line.push(word);
+    tspan.text(line.join(''));
     if (tspan.node().getComputedTextLength() > width) {
-      line.pop()
-      tspan.text(line.join(''))
-      line = [word]
+      line.pop();
+      tspan.text(line.join(''));
+      line = [word];
       tspan = currentShape.append('tspan').attr('x', x).attr('y', ++lineNumber * lineHeight + y).text(word)
     }
   }

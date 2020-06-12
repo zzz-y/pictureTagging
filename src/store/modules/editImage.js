@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import * as $ from 'jquery'
 
 const editImage = {
   namespaced: true,
@@ -14,10 +13,6 @@ const editImage = {
         color: '#ea4c72',
         fontSize: 14
       },
-      tag: {
-        color: '#f5b225',
-        background: '#bfbfbf'
-      },
     },
     currentEdit: {
       strokeWidth: 2,
@@ -27,10 +22,6 @@ const editImage = {
       text: {
         color: '#ea4c72',
         fontSize: 14
-      },
-      tag: {
-        color: '#f5b225',
-        background: '#bfbfbf'
       },
     },
     currentSvg: [],
@@ -42,34 +33,31 @@ const editImage = {
     },
     SET_STROKE_COLOR: (state, data) => {
       switch (data.id) {
+        case 1:
+          state.currentEdit.pathColor = data.color;
+          break;
         case 2:
-          state.currentEdit.pathColor = data.color
-          break
+          state.currentEdit.rectColor = data.color;
+          break;
         case 3:
-          state.currentEdit.rectColor = data.color
-          break
+          state.currentEdit.ellipseColor = data.color;
+          break;
         case 4:
-          state.currentEdit.ellipseColor = data.color
-          break
-        case 5:
-          state.currentEdit.text.color = data.color
-          break
-        case 6:
-          state.currentEdit.tag.color = data.color
-          break
+          state.currentEdit.text.color = data.color;
+          break;
         default:
           break
       }
     },
     SET_FONT_SIZE: (state, fontSize) => {
-      state.currentEdit.text.fontSize = fontSize
+      state.currentEdit.text.fontSize = fontSize;
     },
     SET_CURRENT_SVG: (state, data) => {
       state.currentSvg.push(data)
     },
     SET_IMAGE_LIST: (state, data) => {
       if (state.currentImage.uid) {
-        const index = state.imageList.findIndex(e => e.image.uid === state.currentImage.uid)
+        const index = state.imageList.findIndex(e => e.image.uid === state.currentImage.uid);
         if (index < 0) {
           state.imageList.push({
             edit: state.currentEdit,
@@ -83,14 +71,14 @@ const editImage = {
             image: state.currentImage
           })
         }
-        const currentIndex = state.imageList.findIndex(e => e.image.uid === data.uid)
+        const currentIndex = state.imageList.findIndex(e => e.image.uid === data.uid);
         if (currentIndex < 0) {
-          state.currentEdit = _.cloneDeep(state.initEdit)
-          state.currentSvg = []
+          state.currentEdit = _.cloneDeep(state.initEdit);
+          state.currentSvg = [];
           state.currentImage = _.cloneDeep(data)
         } else {
-          state.currentEdit = _.cloneDeep(state.imageList[currentIndex].edit)
-          state.currentSvg = _.cloneDeep(state.imageList[currentIndex].svg)
+          state.currentEdit = _.cloneDeep(state.imageList[currentIndex].edit);
+          state.currentSvg = _.cloneDeep(state.imageList[currentIndex].svg);
           state.currentImage = _.cloneDeep(state.imageList[currentIndex].image)
         }
       } else {
@@ -98,7 +86,7 @@ const editImage = {
       }
     },
     DELETE_CURRENT_SVG: (state, data) => {
-      const i = state.currentSvg.findIndex(e => e.id === data.id)
+      const i = state.currentSvg.findIndex(e => e.id === data.id);
       state.currentSvg.splice(i, 1)
     },
   },
@@ -128,6 +116,6 @@ const editImage = {
       commit('SET_IMAGE_LIST', data)
     }
   }
-}
+};
 
 export default editImage

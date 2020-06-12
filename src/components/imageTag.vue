@@ -3,7 +3,7 @@
     <div class="operation-wrapper">
       <el-button type="text"
                  v-for="obj in operationList"
-                 :class="active===obj.id?'active':''"
+                 :class="activeId===obj.id?'active':''"
                  :title="obj.name"
                  @click="shapeToggle(obj.id)">
         <svg-icon :icon-class="obj.icon"></svg-icon>
@@ -19,10 +19,9 @@
       <el-button type="text" @click="deleteTag">
         <svg-icon icon-class="eraser"></svg-icon>
       </el-button>
-      <el-button size="mini">保存</el-button>
     </div>
-    <div class="style-config" v-if="active<7">
-      <span class="stroke-width" v-if="active<4">
+    <div class="style-config" v-if="activeId">
+      <span class="stroke-width" v-if="activeId<4">
         <span :class="currentEdit.strokeWidth===2?'checked':''"
               @click="changeStrokeWidth(2)">
           <span class="dot mini"></span>
@@ -34,7 +33,7 @@
               @click="changeStrokeWidth(8)">
           <span class="dot large"></span></span>
       </span>
-      <span class="font-size-select" v-if="active===4">
+      <span class="font-size-select" v-if="activeId===4">
         <el-select v-model="fontSize" size="mini" @change="changeFontSize">
           <el-option v-for="size in fontSizeList" :key="size" :value="size">{{size}}</el-option>
         </el-select>
@@ -65,21 +64,23 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import { drawInit, toggleDrawingMode, changeScale,
   scaleGraphics, deleteTags, changeImageBg } from '@/js/draw'
 import { mapState, mapActions } from 'vuex'
 
-const width = 600
-const height = 500
+const width = $('.main').width();
+const height = 500;
 export default {
   name: 'HelloWorld',
   props: {
-    msg: String
+    colorList: Array,
+    fontSizeList: Array,
+    active: Number,
   },
   data() {
     return {
-      imageUrl: '',
-      active: 0,
+      activeId: null,
       operationList: [
         {
           id: 1,
@@ -102,12 +103,8 @@ export default {
           icon: 'text'
         },
       ],
-      checkedColor: '',
-      colorList: [
-        '#ea4c72', '#f5b225', '#48c486', '#4386f5', '#000000', '#ffffff'
-      ],
-      fontSizeList: [8, 9, 10, 12, 14, 16, 18, 20, 22],
       fontSize: '',
+      checkedColor: '',
       scaleList: [
         {
           width: width * 0.2,
@@ -135,8 +132,8 @@ export default {
           scale: 0.9
         },
         {
-          width: 598,
-          height: 460,
+          width: width,
+          height: height - 40,
           scale: 1
         },
         {
@@ -173,8 +170,13 @@ export default {
     };
   },
   mounted () {
-    drawInit()
+    drawInit();
     console.log(this.currentEdit);
+  },
+  watch: {
+    active() {
+      this.activeId = this.active
+    }
   },
   methods: {
     ...mapActions('editImage', [
@@ -184,22 +186,22 @@ export default {
       'updateImageList',
     ]),
     shapeToggle (shapeId) {
-      this.active = shapeId
-      toggleDrawingMode(shapeId)
+      this.activeId = shapeId;
+      toggleDrawingMode(shapeId);
       switch (shapeId) {
         case 1:
-          this.checkedColor = this.currentEdit.pathColor
-          break
+          this.checkedColor = this.currentEdit.pathColor;
+          break;
         case 2:
-          this.checkedColor = this.currentEdit.rectColor
-          break
+          this.checkedColor = this.currentEdit.rectColor;
+          break;
         case 3:
-          this.checkedColor = this.currentEdit.ellipseColor
-          break
+          this.checkedColor = this.currentEdit.ellipseColor;
+          break;
         case 4:
-          this.checkedColor = this.currentEdit.text.color
-          this.fontSize = this.currentEdit.text.fontSize
-          break
+          this.checkedColor = this.currentEdit.text.color;
+          this.fontSize = this.currentEdit.text.fontSize;
+          break;
         default:
           break
       }
@@ -208,8 +210,8 @@ export default {
       this.updateStrokeWidth(width)
     },
     changeColor (color) {
-      this.checkedColor = color
-      this.updateColor({ id : this.active, color })
+      this.checkedColor = color;
+      this.updateColor({ id : this.activeId, color })
     },
     changeFontSize () {
       this.updateFontSize(this.fontSize)
@@ -220,7 +222,7 @@ export default {
       } else {
         --this.scaleIndex
       }
-      changeScale(this.scaleList[this.scaleIndex].scale)
+      changeScale(this.scaleList[this.scaleIndex].scale);
       scaleGraphics()
     },
     deleteTag () {

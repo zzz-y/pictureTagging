@@ -19,7 +19,10 @@
       </span>
       </div>
     </el-upload>
-    <image-tag></image-tag>
+    <image-tag :colorList="colorList"
+               :fontSizeList="fontSizeList"
+               :active="active"
+    ></image-tag>
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="">
     </el-dialog>
@@ -41,7 +44,11 @@ export default {
       dialogImageUrl: '',
       dialogVisible: false,
       disabled: false,
-      active: 0
+      active: 0,
+      colorList: [
+        '#ea4c72', '#f5b225', '#48c486', '#4386f5', '#000000', '#ffffff'
+      ],
+      fontSizeList: [8, 9, 10, 12, 14, 16, 18, 20, 22],
     }
   },
   methods: {
