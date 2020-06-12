@@ -455,7 +455,7 @@ function wrapWord (width, text) {
   const x = +currentShape.attr('x');
   const y = +currentShape.attr('y');
   let tspan = currentShape.text(null).append('tspan').attr('x', x).attr('y', y);
-  while (word === words.pop()) {
+  while (word = words.pop()) {
     line.push(word);
     tspan.text(line.join(''));
     if (tspan.node().getComputedTextLength() > width) {
