@@ -7,7 +7,33 @@
     flex: 1;
   }
 
-  .upload-wrapper{
+  .upload-wrapper {
     padding: 1rem;
+    max-height: 500px;
+    overflow: auto;
+
+    .el-upload--picture-card {
+      height: 6.5rem;
+      line-height: 6.5rem;
+      width: 6.5rem;
+    }
+
+    .el-upload-list--picture-card {
+
+      .el-upload-list__item {
+        height: 6.5rem;
+        line-height: 6.5rem;
+        width: 6.5rem;
+
+        .file {
+          display: flex;
+          align-items: center;
+          height: 100%;
+        }
+      }
+      .el-upload-list__item-thumbnail{
+        height: initial;
+      }
+    }
   }
 }
